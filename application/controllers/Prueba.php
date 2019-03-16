@@ -9,6 +9,16 @@ use Restserver\Libraries\REST_Controller;
 
 class Prueba extends REST_Controller
 {
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->database();
+        header("Access-Control-Allow-Methods: PUT, GET, POST, DELETE, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type, Content-Length, Accept-Encoding");
+        header("Access-Control-Allow-Origin: *");
+    }
+
     public function index($nombre)
     {
         echo "Hola $nombre!!!!";
@@ -30,12 +40,10 @@ class Prueba extends REST_Controller
         }
     }
 
-    public function obtener_producto($codigo)
+    public function obtener_producto_get($codigo)
     {
-        $this->load->database();
-
         $query = $this->db->query("SELECT * FROM `productos` WHERE codigo = '" . $codigo . "'");
 
-        echo json_encode($query->result());
+        $this->response($query->result());
     }
 }
