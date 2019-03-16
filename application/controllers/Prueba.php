@@ -19,9 +19,9 @@ class Prueba extends REST_Controller
         header("Access-Control-Allow-Origin: *");
     }
 
-    public function index($nombre)
+    public function index($nombre = "Guille")
     {
-        echo "Hola $nombre!!!!";
+        echo "Hola " . $nombre . "!!!!";
     }
 
     public function obtener_arreglo_get($index = 0)
