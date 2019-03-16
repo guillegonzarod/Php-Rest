@@ -14,5 +14,13 @@ class Prueba extends CI_Controller
 
         echo json_encode($arreglo[$index]);
     }
-}
 
+    public function obtener_producto($codigo)
+    {
+        $this->load->database();
+
+        $query = $this->db->query("SELECT * FROM `productos` WHERE codigo = '" . $codigo . "'");
+
+        echo json_encode($query->result());
+    }
+}
