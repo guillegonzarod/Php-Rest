@@ -45,21 +45,47 @@ class Pedidos extends REST_Controller
         }
 
         // Comprobamos que el 'id' y el 'token' mandado por el Cliente coinciden con su correspondiente registro en la Base de Datos: 
-        $condiciones = array('id' => $id_usuario, 'token'=> $token );
-        $this->db->where( $condiciones );
+        $condiciones = array('id' => $id_usuario, 'token' => $token);
+        $this->db->where($condiciones);
         $query = $this->db->get('login');
-    
+
         $existe = $query->row();
-    
+
         // Si el 'id' o el 'token' del Cliente no son correctos:
-        if( !$existe ){
-          $respuesta = array(
-                        'error' => TRUE,
-                        'mensaje'=> "Usuario y Token incorrectos"
-                      );
-          $this->response( $respuesta );
-          return;
+        if (!$existe) {
+            $respuesta = array(
+                'error' => true,
+                'mensaje' => "Usuario y Token incorrectos"
+            );
+            $this->response($respuesta);
+            return;
         }
+
+        // Si el 'id' y el 'token' del Cliente son correctos:
+        $this->db->reset_query();
+        // Insertamos el registro del Pedido en la tabla 'ordenes':
+        $insertar = array('usuario_id' => $id_usuario);
+        $this->db->insert('ordenes', $insertar);
+
+        // Obtenemos el 'id' (tiene que ser un campo tipo 'Id' autoincrementado) del último registro insertado en la tabla 'ordenes':
+        $orden_id = $this->db->insert_id();
+
+        // Insertamos los registros del Detalle del Pedido en la tabla 'ordenes_detalle':
+        $this->db->reset_query();
+        // Descomponemos la cadena en un array:
+        $items = explode(',', $data['items']);
+
+        // Recorremos el array de Productos Pedidos y los vamos insertando en la tabla 'ordenes_detalle':
+        foreach ($items as &$producto_id) {
+            $data_insertar = array('producto_id' => $producto_id, 'orden_id' => $orden_id);
+            $this->db->insert('ordenes_detalle', $data_insertar);
+        }
+
+        $respuesta = array(
+            'error' => false,
+            'orden_id' => $orden_id
+        );
+
+        $this->response($respuesta);
     }
 }
-
