@@ -88,4 +88,62 @@ class Pedidos extends REST_Controller
 
         $this->response($respuesta);
     }
+
+    public function obtener_pedidos_get($token = "0", $id_usuario = "0")
+    {
+
+        // Comprobamos que exista algún 'Token' de autorización o algún 'id' de usuario en la Petición:
+        if ($token == "0" || $id_usuario == "0") {
+            $respuesta = array(
+                'error' => true,
+                'mensaje' => "Token invalido y/o usuario invalido."
+            );
+            $this->response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
+            return;
+        }
+
+        // Comprobamos que el 'id' y el 'token' mandado por el Cliente coinciden con su correspondiente registro en la Base de Datos: 
+        $condiciones = array('id' => $id_usuario, 'token' => $token);
+        $this->db->where($condiciones);
+        $query = $this->db->get('login');
+
+        $existe = $query->row();
+
+        if (!$existe) {
+            $respuesta = array(
+                'error' => true,
+                'mensaje' => "Usuario y Token incorrectos"
+            );
+            $this->response($respuesta);
+            return;
+        }
+
+        // Obtenemos todos los Pedidos del Usuario ('$id_usuario'):
+        $query = $this->db->query('SELECT * FROM `ordenes` where usuario_id = ' . $id_usuario);
+
+        $ordenes = array();
+
+        foreach ($query->result() as $row) {
+
+            // Obtenemos el Detalle de cada Pedido:
+            $query_detalle = $this->db->query('SELECT a.orden_id, b.* FROM `ordenes_detalle` a inner join productos b on a.producto_id = b.codigo where orden_id = ' . $row->id);
+
+            // Creamos un array con la Cabecera ('id' y 'creado_en') y Líneas del Pedido ('detalle'):
+            $orden = array(
+                'id' => $row->id,
+                'creado_en' => $row->creado_en,
+                'detalle' => $query_detalle->result()
+            );
+
+            array_push($ordenes, $orden);
+        }
+
+        $respuesta = array(
+            'error' => false,
+            'ordenes' => $ordenes
+        );
+
+
+        $this->response($respuesta);
+    }
 }
