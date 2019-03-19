@@ -27,7 +27,7 @@ class Productos extends REST_Controller
 
         $respuesta = array(
             'error' => false,
-            'lineas' => $query->result_array()
+            'productos' => $query->result_array()
         );
 
         $this->response($respuesta);
@@ -51,7 +51,7 @@ class Productos extends REST_Controller
 
         $respuesta = array(
             'error' => false,
-            'lineas' => $query->result_array()
+            'productos' => $query->result_array()
         );
 
         $this->response($respuesta);
@@ -64,7 +64,7 @@ class Productos extends REST_Controller
         $respuesta = array(
             'error' => false,
             'termino' => $termino,
-            'lineas' => $query->result_array()
+            'productos' => $query->result_array()
         );
 
         $this->response($respuesta);
